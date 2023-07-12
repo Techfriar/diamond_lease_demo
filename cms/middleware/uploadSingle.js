@@ -9,6 +9,11 @@ const __dirname = dirname(__filename);
 // Set the destination directory path
 const uploadDirectory = join(__dirname, '..', 'files');
 
+// Create the "files" directory if it doesn't exist
+if (!fs.existsSync(uploadDirectory)) {
+  fs.mkdirSync(uploadDirectory);
+}
+
 let storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDirectory);
