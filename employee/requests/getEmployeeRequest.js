@@ -1,5 +1,4 @@
 import Joi from 'joi'
-import employee from '../models/employee.js';
 
 class getEmployeeRequest {
   static schema = Joi.object({

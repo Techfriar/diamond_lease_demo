@@ -1,4 +1,4 @@
-import employee from "../models/employee.js";
+import employee from "../models/employee.js"
 
 export default class employeeRepository {
 
