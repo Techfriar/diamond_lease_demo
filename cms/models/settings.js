@@ -6,7 +6,6 @@ const settingsSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
-      link: String,
   },
   { timestamps: true }
 );

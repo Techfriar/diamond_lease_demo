@@ -6,7 +6,14 @@ const bannerSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
-      link: String,
+      link:{
+        type: String,
+        required: false,
+      },
+      is_main_banner: {
+        type: Boolean,
+        required: true,
+      }
   },
   { timestamps: true }
 );

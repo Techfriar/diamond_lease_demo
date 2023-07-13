@@ -1,10 +1,11 @@
 import asyncHandler from "express-async-handler";
 import bannerRepository from "../repositories/bannerRepository.js";
 import bannerResource from "../resoureces/bannerResource.js";
-import uploadMultipleFileMiddleware from "../middleware/uploadMultiple.js";
-import uploadSingleFileMiddleware from "../middleware/uploadSingle.js";
-import fs from "fs";
-import path from "path";
+import deleteBannerRequest from "../requests/banner/deleteBannerRequest.js";
+import { deleteImage } from "../utils/fileDeletion.js";
+import addLinkToBannerRequest from "../requests/banner/addLinkToBannerRequest.js";
+import uploadMultipleFile from "../utils/uploadMultiple.js";
+import uploadSingleFile from "../utils/uploadSingle.js";
 
 const bannerRepo = new bannerRepository();
 
@@ -27,6 +28,9 @@ const bannerRepo = new bannerRepository();
  *                 type: string
  *                 format: binary
  *                 description: Banner image
+ *               link:
+ *                 type: string
+ *                 description: Link
  *     responses:
  *       200:
  *         description: Success
@@ -38,14 +42,15 @@ const bannerRepo = new bannerRepository();
 const addMainBanner = async (req, res) => {
   try {
     // Handle the file upload
-    await uploadSingleFileMiddleware(req, res);
-
-    if (req.file == undefined) {
+    await uploadSingleFile(req, res);
+    if (!req.uploadedFile) {
       return res.status(400).send({ message: "Please upload a file!" });
     }
+
     const bannerDetails = {
-      banner_path: req.file.path,
-      link: req.file.filename,
+      banner_path: "/test/" + req.uploadedFile.filename,
+      link: req.body.link,
+      is_main_banner: true,
     };
 
     const bannerData = await bannerRepo.addBanner(bannerDetails);
@@ -93,14 +98,12 @@ const addMainBanner = async (req, res) => {
 const addMultipleBanners = async (req, res) => {
   try {
     // Handle the file uploads
-    await uploadMultipleFileMiddleware(req, res);
+    await uploadMultipleFile(req, res);
 
-    //Process each uploaded file
-    const bannerPaths = req.files.map((file) => {
-      const fileName = file.filename;
+    // Process each uploaded file
+    const bannerPaths = req.uploadedFiles.map((file) => {
       return {
-        path: file.path,
-        originalFilename: fileName,
+        path: "/test/" + file.filename,
       };
     });
 
@@ -108,7 +111,8 @@ const addMultipleBanners = async (req, res) => {
     const bannerDataPromises = bannerPaths.map((banner) => {
       const bannerDetails = {
         banner_path: banner.path,
-        link: banner.originalFilename,
+        link: "",
+        is_main_banner: false,
       };
       return bannerRepo.addBanner(bannerDetails);
     });
@@ -139,6 +143,55 @@ const addMultipleBanners = async (req, res) => {
  *       - application/json
  *     parameters:
  *        - in: query
+ *          name: _id
+ *          description: Enter _id
+ *          type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ *       422:
+ *         description: Unprocessable Entity
+ *       401:
+ *         description: Unauthenticated
+ */
+const deleteBanner = asyncHandler(async (req, res) => {
+  const { _id } = req.query;
+  const bannerRequest = new deleteBannerRequest({
+    _id,
+  });
+  try {
+    const validatedData = bannerRequest.validate();
+    const bannerData = await bannerRepo.getBanner(validatedData);
+    const deletedImage = await bannerRepo.deleteBanner(validatedData);
+    if (bannerData && deletedImage) {
+      deleteImage("test", bannerData.banner_path.split("/test/")[1]);
+      res
+        .status(200)
+        .json({ status: true, message: `Image deleted successfully` });
+    }
+  } catch (error) {
+    console.error("Error deleting imageeeeeeee:", error);
+    res.status(500).json({ message: "Error deleting image" });
+  }
+});
+
+/**
+ * Add link to banner
+ *
+ * @swagger
+ * /banner/add_link:
+ *   post:
+ *     tags:
+ *       - Banner
+ *     summary: Add link to banner
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *        - in: query
+ *          name: _id
+ *          description: Enter _id
+ *          type: string
+ *        - in: query
  *          name: link
  *          description: Enter link
  *          type: string
@@ -150,51 +203,22 @@ const addMultipleBanners = async (req, res) => {
  *       401:
  *         description: Unauthenticated
  */
-const deleteBanner = asyncHandler(async (req, res) => {
-  const filename = req.query.link;
-
+const addLinkToBanner = asyncHandler(async (req, res) => {
+  const { _id, link } = req.query;
+  const bannerRequest = new addLinkToBannerRequest({
+    _id,
+    link,
+  });
   try {
-    // Check if the filename is provided
-    if (!filename) {
-      return res.status(400).json({ message: "Invalid filename" });
-    }
-
-    // Construct the path to the image file
-    const imagePath = path.join(process.cwd(), "files", filename);
-
-    // Check if the image file exists
-    if (!fs.existsSync(imagePath)) {
-      return res.status(404).json({ message: "Image not found" });
-    }
-
-    // Delete the image file from the folder
-    fs.unlink(imagePath, async (err) => {
-      if (err) {
-        console.error("Error deleting image file:", err);
-        return res.status(500).json({ message: "Error deleting image" });
-      }
-
-      try {
-        // Remove the image entry from the collection
-        const deletedImage = bannerRepo.deleteBanner({ link: filename });
-
-        if (!deletedImage) {
-          return res
-            .status(404)
-            .json({ message: "Image not found in collection" });
-        }
-
-        // File and collection entry deleted successfully
-        res.status(200).json({ message: "Image deleted successfully" });
-      } catch (error) {
-        console.error("Error deleting image from collection:", error);
-        res.status(500).json({ message: "Error deleting image" });
-      }
-    });
+    const validatedData = bannerRequest.validate();
+    let bannerData = await bannerRepo.getBanner(validatedData);
+    bannerData.link = link;
+    const banner = await bannerRepo.updateBanner(bannerData);
+    res.status(200).json({ status: true, message: `Image link added successfully`, data: banner });
   } catch (error) {
-    console.error("Error deleting image:", error);
-    res.status(500).json({ message: "Error deleting image" });
+    console.error("Unable to add link", error);
+    res.status(500).json({ message: "Error while adding link" });
   }
 });
 
-export { addMainBanner, addMultipleBanners, deleteBanner };
+export { addMainBanner, addMultipleBanners, deleteBanner, addLinkToBanner };

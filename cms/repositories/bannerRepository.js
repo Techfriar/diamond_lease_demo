@@ -22,8 +22,36 @@ export default class bannerRepository {
    * @param  String link
    * @returns Boolean true|false
    */
-  async deleteBanner(link) {
-    return banner.findOneAndDelete(link);
+  async deleteBanner(bannerId) {
+    const bannerData = await banner.findById(bannerId);
+    if (!bannerData) {
+      return null;
+    }
+    await bannerData.deleteOne(bannerId);
+    return true;
+  }
+
+  /**
+   * Get banner
+   * @param Integer bannerId
+   * @return Banner banner
+   */
+  async getBanner(bannerId) {
+    return banner.findById(bannerId);
+  }
+
+  /**
+   * Update banner link
+   * @param banner data
+   */
+  async updateBanner(bannerDetails) {
+    const bannerData = await banner.findById(bannerDetails._id);
+    if (!bannerData) {
+      return null;
+    }
+    Object.assign(bannerData, bannerDetails);
+    await bannerData.save();
+    return bannerData;
   }
 
 }

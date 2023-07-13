@@ -1,6 +1,6 @@
 import express from 'express';
-import { addMainBanner, addMultipleBanners, deleteBanner } from '../controllers/bannerController.js';
-import { addLogo, updateLogo } from '../controllers/settingsController.js';
+import { addLinkToBanner, addMainBanner, addMultipleBanners, deleteBanner } from '../controllers/bannerController.js';
+import { addLogo } from '../controllers/settingsController.js';
 import { addQuickLink, deleteQuickLink, getQuickLink, listQuickLinks, updateQuickLink } from '../controllers/quickLinkController.js';
 import { addContactCMS, deleteContactCMS, getContactCMS, listContactCMSs, updateContactCMS } from '../controllers/contactCMSController.js';
 const router = express.Router();
@@ -12,12 +12,12 @@ const router = express.Router();
 router.route("/banner/add").post(addMainBanner);
 router.route("/banner/multiple_add").post(addMultipleBanners);
 router.route("/banner/delete").post(deleteBanner);
+router.route("/banner/add_link").post(addLinkToBanner);
 
 /**
  * Settings routes
  */
 router.route("/settings/add_logo").post(addLogo);
-router.route("/settings/update_logo").post(updateLogo);
 
 /**
  * Quick link routes
