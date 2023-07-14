@@ -9,34 +9,21 @@ const router = express.Router();
 /**
  * banner routes
  */
-router.route("/banner/add").post(addMainBanner);
-router.route("/banner/multiple_add").post(addMultipleBanners);
-router.route("/banner/delete").post(deleteBanner);
-router.route("/banner/add_link").post(addLinkToBanner);
-//router.route("/banner/list").post(listBanners);
+router.route("/banner/list").post(listBanners);
 
 /**
  * Settings routes
  */
-router.route("/settings/add_logo").post(addLogo);
 router.route("/settings/list_logo").post(listLogo);
 
 /**
  * Quick link routes
  */
-router.route("/quick_link/add").post(addQuickLink);
-router.route("/quick_link/get").post(getQuickLink);
-router.route("/quick_link/update").post(updateQuickLink);
 router.route("/quick_link/list").post(listQuickLinks);
-router.route("/quick_link/delete").post(deleteQuickLink);
 
 /**
  * Contact cms routes
  */
-router.route("/contact_cms/add").post(addContactCMS);
-router.route("/contact_cms/get").post(getContactCMS);
 router.route("/contact_cms/list").post(listContactCMSs);
-router.route("/contact_cms/update").post(updateContactCMS);
-router.route("/contact_cms/delete").post(deleteContactCMS);
 
 export default router;

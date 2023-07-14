@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import api from './routes/api.js'
+import route from './routes/route.js'
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import connectDB from './config/db.js';
 import swaggerUi from "swagger-ui-express";
@@ -45,7 +46,7 @@ const options = {
       },
       servers: [
         {
-          url: "http://localhost:3000/api",
+          url: "http://localhost:3000",
           description: "Local server",
         },
       ],
@@ -59,10 +60,9 @@ const options = {
     swaggerUi.serve,
     swaggerUi.setup(specs, { explorer: true })
   );
-  
 
 app.use('/api', api);
-
+app.use('/public', route);
 
 app.listen(port, () => console.log(`Server started on port ${port}...`));
 app.use(notFound);

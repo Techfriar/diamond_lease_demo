@@ -3,13 +3,14 @@ import settingsResource from "../resoureces/settingsResource.js";
 import settingsRepository from "../repositories/settingsRepository.js";
 import { deleteImage } from "../utils/fileDeletion.js";
 import uploadSingleFile from "../utils/uploadSingle.js";
+import { minioClient } from "../server.js";
 
 const settingsRepo = new settingsRepository();
 
 /**
  * Add logo
  * @swagger
- * /settings/add_logo:
+ * /api/settings/add_logo:
  *   post:
  *     tags:
  *       - Settings
@@ -66,4 +67,36 @@ const addLogo = asyncHandler(async (req, res) => {
   }
 }); 
 
-export { addLogo };
+/**
+ * List logo
+ * @swagger
+ * /public/settings/list_logo:
+ *   post:
+ *     tags:
+ *       - Settings
+ *     summary: List logo
+ *     responses:
+ *       200:
+ *         description: Success
+ *       400:
+ *         description: Bad Request
+ *       500:
+ *         description: Internal Server Error
+ */
+const listLogo = asyncHandler(async (req, res) => {
+  try {
+    const logoDatas = await settingsRepo.getLogo();
+    if (logoDatas) {
+      logoDatas.logo_path = minioClient.protocol + "//" + "localhost:9000" + logoDatas.logo_path;
+       const logo =  settingsResource(logoDatas);
+      res.json(logo);
+    } else {
+      res.status(404);
+      throw new Error("Unable to add employee");
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+export { addLogo , listLogo};

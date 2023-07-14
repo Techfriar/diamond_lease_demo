@@ -54,4 +54,12 @@ export default class bannerRepository {
     return bannerData;
   }
 
+  /**
+   * List banners
+   * @return banners
+   */
+  async listBanners() {
+    return banner.find();
+  }
+
 }

@@ -11,7 +11,7 @@ const contactCMSRepo = new contactCMSRepository();
  * Add conatct CMS
  *
  * @swagger
- * /contact_cms/add:
+ * /api/contact_cms/add:
  *   post:
  *     tags:
  *       - Contact CMS
@@ -86,7 +86,7 @@ const addContactCMS = asyncHandler(async (req, res) => {
  * Get conatct CMS
  *
  * @swagger
- * /contact_cms/get:
+ * /api/contact_cms/get:
  *   post:
  *     tags:
  *       - Contact CMS
@@ -136,7 +136,7 @@ const getContactCMS = asyncHandler(async (req, res) => {
  * List conatct CMSs
  *
  * @swagger
- * /contact_cms/list:
+ * /public/contact_cms/list:
  *   post:
  *     tags:
  *       - Contact CMS
@@ -175,7 +175,7 @@ const listContactCMSs = asyncHandler(async (req, res) => {
  * Update conatct CMS
  *
  * @swagger
- * /contact_cms/update:
+ * /api/contact_cms/update:
  *   post:
  *     tags:
  *       - Contact CMS
@@ -255,7 +255,7 @@ const updateContactCMS = asyncHandler(async (req, res) => {
  * Delete conatct CMS
  *
  * @swagger
- * /contact_cms/delete:
+ * /api/contact_cms/delete:
  *   post:
  *     tags:
  *       - Contact CMS
