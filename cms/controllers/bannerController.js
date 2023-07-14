@@ -6,13 +6,14 @@ import { deleteImage } from "../utils/fileDeletion.js";
 import addLinkToBannerRequest from "../requests/banner/addLinkToBannerRequest.js";
 import uploadMultipleFile from "../utils/uploadMultiple.js";
 import uploadSingleFile from "../utils/uploadSingle.js";
+import { minioClient } from "../server.js";
 
 const bannerRepo = new bannerRepository();
 
 /**
  * Add main banner
  * @swagger
- * /banner/add:
+ * /api/banner/add:
  *   post:
  *     tags:
  *       - Banner
@@ -69,7 +70,7 @@ const addMainBanner = async (req, res) => {
 /**
  * Add multiple banners
  * @swagger
- * /banner/multiple_add:
+ * /api/banner/multiple_add:
  *   post:
  *     tags:
  *       - Banner
@@ -134,7 +135,7 @@ const addMultipleBanners = async (req, res) => {
  * Delete banner
  *
  * @swagger
- * /banner/delete:
+ * /api/banner/delete:
  *   post:
  *     tags:
  *       - Banner
@@ -179,7 +180,7 @@ const deleteBanner = asyncHandler(async (req, res) => {
  * Add link to banner
  *
  * @swagger
- * /banner/add_link:
+ * /api/banner/add_link:
  *   post:
  *     tags:
  *       - Banner
@@ -221,4 +222,38 @@ const addLinkToBanner = asyncHandler(async (req, res) => {
   }
 });
 
-export { addMainBanner, addMultipleBanners, deleteBanner, addLinkToBanner };
+/**
+ * List banners
+ * @swagger
+ * /public/banner/list:
+ *   post:
+ *     tags:
+ *       - Banner
+ *     summary: List Banners
+ *     responses:
+ *       200:
+ *         description: Success
+ *       400:
+ *         description: Bad Request
+ *       500:
+ *         description: Internal Server Error
+ */
+const listBanners = asyncHandler(async (req, res) => {
+  try {
+    const bannerDatas = await bannerRepo.listBanners();
+    if (bannerDatas) {
+      bannerDatas.forEach((banner) => {
+        banner.banner_path = minioClient.protocol + "//" + "localhost:9000" + banner.banner_path;
+        bannerResource(banner);
+      });
+      res.json(bannerDatas);
+    } else {
+      res.status(404);
+      throw new Error("Unable to add employee");
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+export { addMainBanner, addMultipleBanners, deleteBanner, addLinkToBanner,listBanners };

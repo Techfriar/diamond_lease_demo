@@ -12,7 +12,7 @@ const quickLinkRepo = new quickLinkRepository();
  * Add quick link
  *
  * @swagger
- * /quick_link/add:
+ * /api/quick_link/add:
  *   post:
  *     tags:
  *       - Quick Link
@@ -65,7 +65,7 @@ const addQuickLink = asyncHandler(async (req, res) => {
  * Get quick link
  *
  * @swagger
- * /quick_link/get:
+ * /api/quick_link/get:
  *   post:
  *     tags:
  *       - Quick Link
@@ -114,7 +114,7 @@ const getQuickLink = asyncHandler(async (req, res) => {
  * Update quick link
  *
  * @swagger
- * /quick_link/update:
+ * /api/quick_link/update:
  *   post:
  *     tags:
  *       - Quick Link
@@ -173,7 +173,7 @@ const updateQuickLink = asyncHandler(async (req, res) => {
  * list quick links
  *
  * @swagger
- * /quick_link/list:
+ * /public/quick_link/list:
  *   post:
  *     tags:
  *       - Quick Link
@@ -210,7 +210,7 @@ const listQuickLinks = asyncHandler(async (req, res) => {
  * Delete quick link
  *
  * @swagger
- * /quick_link/delete:
+ * /api/quick_link/delete:
  *   post:
  *     tags:
  *       - Quick Link
